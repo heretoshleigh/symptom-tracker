@@ -11,7 +11,7 @@
 
 <body>
 
-    <h1>My Symptoms</h1>
+    <h1>Edit an entry</h1>
 
     <form action="/addEntry" method="POST">
         <label for="date">Select a date:</label>
@@ -31,17 +31,8 @@
         </fieldset>
         <button type="submit">Submit</button>
     </form>
-    
-    <ul class="symptomHistory">
-        <% entries.forEach(entry => {%>
-        <li>
-            <span><%= entry.date %></span>
-            <span><%= `: ${entry.painLevel}` %></span>
-            <a href="/editEntry/<%= entry._id %>"><span class="fa-solid fa-pen-to-square"></span></a>
-            <span class="deleteButton fa-solid fa-trash-can"></span>
-        </li>
-        <% }) %>
-    </ul>
+
+    <span id="deleteButton" class="fa-solid fa-trash-can"></span>
 
     <script src="https://kit.fontawesome.com/c70c69bd1d.js" crossorigin="anonymous"></script>
     <script src='js/main.js'></script>

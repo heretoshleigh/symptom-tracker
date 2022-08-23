@@ -1,24 +1,24 @@
-const deleteText = document.querySelectorAll('.fa-trash')
-const thumbText = document.querySelectorAll('.fa-thumbs-up')
+//IGNORE COMMENTED OUT CODE - JUST LEGO BLOCKS TO USE LATER
 
-Array.from(deleteText).forEach((element)=>{
-    element.addEventListener('click', deleteRapper)
+// const editButton = document.querySelector('.editButton')
+const deleteButton = document.querySelectorAll('.deleteButton')
+
+// Array.from(editButton).forEach((element)=>{
+//     element.addEventListener('click', editEntry)
+// })
+
+Array.from(deleteButton).forEach((element)=>{
+    element.addEventListener('click', deleteEntry)
 })
 
-Array.from(thumbText).forEach((element)=>{
-    element.addEventListener('click', addLike)
-})
-
-async function deleteRapper(){
-    const sName = this.parentNode.childNodes[1].innerText
-    const bName = this.parentNode.childNodes[3].innerText
+async function deleteEntry(){
+    const date = this.parentNode.childNodes[1].innerText
     try{
-        const response = await fetch('deleteRapper', {
+        const response = await fetch('deleteEntry', {
             method: 'delete',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-              'stageNameS': sName,
-              'birthNameS': bName
+              'date': date
             })
           })
         const data = await response.json()
@@ -30,25 +30,23 @@ async function deleteRapper(){
     }
 }
 
-async function addLike(){
-    const sName = this.parentNode.childNodes[1].innerText
-    const bName = this.parentNode.childNodes[3].innerText
-    const tLikes = Number(this.parentNode.childNodes[5].innerText)
-    try{
-        const response = await fetch('addOneLike', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              'stageNameS': sName,
-              'birthNameS': bName,
-              'likesS': tLikes
-            })
-          })
-        const data = await response.json()
-        console.log(data)
-        location.reload()
+// async function editEntry(){
+//     const date = this.parentNode.childNodes[1].innerText
+//     try{
+//         const response = await fetch('addOneLike', {
+//             method: 'put',
+//             headers: {'Content-Type': 'application/json'},
+//             body: JSON.stringify({
+//               'stageNameS': sName,
+//               'birthNameS': bName,
+//               'likesS': tLikes
+//             })
+//           })
+//         const data = await response.json()
+//         console.log(data)
+//         location.reload()
 
-    }catch(err){
-        console.log(err)
-    }
-}
+//     }catch(err){
+//         console.log(err)
+//     }
+// }
