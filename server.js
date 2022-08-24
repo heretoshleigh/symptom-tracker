@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
 const PORT = 2121
+const ObjectId = require('mongodb').ObjectID
+const methodOverride = require('method-override')
 require('dotenv').config()
 
 let db,
@@ -19,15 +21,26 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
+//METHOD OVERRIDE
+app.use(methodOverride(function (req, res) {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      // look in urlencoded POST bodies and delete it
+      let method = req.body._method
+      delete req.body._method
+      return method
+    }
+}))
 
+//LOAD HOMEPAGE
 app.get('/',(request, response)=>{
-    db.collection('symptoms').find().toArray()
+    db.collection('symptoms').find().sort({date:-1}).toArray()
     .then(data => {
         response.render('index.ejs', { entries: data })
     })
     .catch(error => console.error(error))
 })
 
+//ADD NEW ENTRY
 app.post('/addEntry', (request, response) => {
     db.collection('symptoms').insertOne({
         date: request.body.date,
@@ -39,10 +52,9 @@ app.post('/addEntry', (request, response) => {
     .catch(error => console.error(error))
 })
 
-app.get('/editEntry/:id',(request, response)=>{
-    const id = request.params.id;
-    console.log(id)
-    db.collection('symptoms').findOne({ _id: id })
+//LOAD EDIT PAGE FOR EXISTING ENTRY
+app.get('/editPage/:id',(request, response)=>{
+    db.collection('symptoms').findOne({ _id: ObjectId(request.params.id) })
     .then(data => {
         console.log(data)
         response.render('edit.ejs', { entry: data })
@@ -50,24 +62,25 @@ app.get('/editEntry/:id',(request, response)=>{
     .catch(error => console.error(error))
 })
 
-//IGNORE THIS - JUST A LEGO BLOCK TO USE LATER
-// app.put('/addOneLike', (request, response) => {
-//     db.collection('symptoms').updateOne({stageName: request.body.stageNameS, birthName: request.body.birthNameS,likes: request.body.likesS},{
-//         $set: {
-//             likes:request.body.likesS + 1
-//           }
-//     },{
-//         sort: {_id: -1},
-//         upsert: true
-//     })
-//     .then(result => {
-//         console.log('Added One Like')
-//         response.json('Like Added')
-//     })
-//     .catch(error => console.error(error))
+//EDIT EXISTING ENTRY
+app.put('/editEntry/:id', (request, response) => {
+    db.collection('symptoms').updateOne(
+        {_id: ObjectId(request.params.id)},
+        {
+            $set: {
+                date: request.body.date,
+                painLevel: request.body.painLevel
+            }
+        })
+    .then(result => {
+        console.log('Entry updated')
+        response.redirect('/')
+    })
+    .catch(error => console.error(error))
 
-// })
+})
 
+//DELETE EXISTING ENTRY
 app.delete('/deleteEntry', (request, response) => {
     db.collection('symptoms').deleteOne({date: request.body.date})
     .then(result => {
